@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+{% block page_title %}Search Results{% endblock %}
+{% block nav_filter %}active{% endblock %}
+
+{% block extra_style %}
+.results-header {
+background: linear-gradient(135deg, #4361ee, #7209b7);
+border-radius: 16px;
+padding: 22px 28px;
+color: #fff;
+margin-bottom: 24px;
+display: flex;
+align-items: center;
+gap: 16px;
+flex-wrap: wrap;
+}
+
+.results-header h3 {
+font-size: 18px;
+font-weight: 800;
+margin: 0;
+flex: 1;
+}
+
+.results-header p {
+font-size: 13px;
+color: rgba(255,255,255,0.75);
+margin: 4px 0 0;
+}
+
+.result-count-badge {
+background: rgba(255,255,255,0.2);
+border: 1px solid rgba(255,255,255,0.3);
+border-radius: 100px;
+padding: 6px 16px;
+font-size: 13px;
+font-weight: 700;
+color: #fff;
+white-space: nowrap;
+}
+
+.uni-card {
+background: #fff;
+border-radius: 16px;
+border: 1px solid var(--border);
+box-shadow: var(--shadow-sm);
+overflow: hidden;
+transition: transform 0.22s, box-shadow 0.22s;
+height: 100%;
+display: flex;
+flex-direction: column;
+}
+
+.uni-card:hover {
+transform: translateY(-4px);
+box-shadow: var(--shadow-lg);
+}
+
+.uni-card-top {
+background: linear-gradient(135deg, #f8faff, #f5f3ff);
+padding: 20px 20px 16px;
+border-bottom: 1px solid var(--border);
+}
+
+.uni-name {
+font-size: 16px;
+font-weight: 800;
+color: var(--text-primary);
+margin-bottom: 6px;
+line-height: 1.3;
+}
+
+.uni-meta {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+align-items: center;
+}
+
+.meta-tag {
+background: #eef2ff;
+color: var(--primary);
+border-radius: 100px;
+padding: 3px 10px;
+font-size: 11px;
+font-weight: 600;
+display: inline-flex;
+align-items: center;
+gap: 4px;
+}
+
+.meta-tag.country { background: #f0fdf4; color: #15803d; }
+.meta-tag.fees { background: #fffbeb; color: #92400e; }
+.meta-tag.rank { background: #fff1f2; color: #be123c; }
+
+.ml-score-badge {
+margin-left: auto;
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+color: #fff;
+border-radius: 10px;
+padding: 6px 12px;
+text-align: center;
+min-width: 60px;
+}
+
+.ml-score-badge .score-val {
+font-size: 18px;
+font-weight: 800;
+display: block;
+line-height: 1;
+}
+
+.ml-score-badge .score-lbl {
+font-size: 9px;
+font-weight: 600;
+opacity: 0.8;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+.uni-card-body {
+padding: 16px 20px;
+flex: 1;
+display: flex;
+flex-direction: column;
+}
+
+.reasons-list {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+flex: 1;
+align-content: flex-start;
+}
+
+.reason-pill {
+background: #f1f5f9;
+color: var(--text-primary);
+border-radius: 100px;
+padding: 4px 10px;
+font-size: 11px;
+font-weight: 500;
+display: inline-flex;
+align-items: center;
+gap: 4px;
+}
+
+.uni-card-footer {
+padding: 12px 20px;
+border-top: 1px solid var(--border);
+display: flex;
+gap: 10px;
+align-items: center;
+flex-wrap: wrap;
+}
+
+/* Compare checkbox label */
+.btn-compare-check {
+display: flex;
+align-items: center;
+gap: 6px;
+font-size: 12px;
+font-weight: 600;
+color: var(--text-secondary);
+cursor: pointer;
+user-select: none;
+padding: 5px 10px;
+border-radius: 8px;
+transition: background 0.18s, color 0.18s;
+}
+
+.btn-compare-check:hover {
+background: #eef2ff;
+color: var(--primary);
+}
+
+.btn-compare-check.selected {
+background: #eef2ff;
+color: var(--primary);
+}
+
+.btn-compare-check input[type="checkbox"] {
+accent-color: var(--primary);
+width: 15px;
+height: 15px;
+cursor: pointer;
+}
+
+.btn-policies {
+margin-left: auto;
+background: #eef2ff;
+color: var(--primary);
+border: none;
+border-radius: 8px;
+padding: 7px 14px;
+font-size: 12px;
+font-weight: 700;
+cursor: pointer;
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+gap: 5px;
+transition: all 0.2s;
+font-family: 'Inter', sans-serif;
+}
+
+.btn-policies:hover {
+background: var(--primary);
+color: #fff;
+}
+
+/* Floating compare bar */
+.compare-bar {
+position: fixed;
+bottom: 24px;
+left: 50%;
+transform: translateX(-50%) translateY(100px);
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+color: #fff;
+border-radius: 100px;
+padding: 14px 28px;
+display: flex;
+align-items: center;
+gap: 16px;
+box-shadow: 0 8px 32px rgba(67,97,238,0.45);
+z-index: 999;
+transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+font-size: 15px;
+font-weight: 700;
+pointer-events: none;
+opacity: 0;
+}
+
+.compare-bar.visible {
+transform: translateX(-50%) translateY(0);
+pointer-events: auto;
+opacity: 1;
+}
+
+.btn-compare-now {
+background: #fff;
+color: var(--primary);
+border: none;
+border-radius: 100px;
+padding: 8px 20px;
+font-size: 13px;
+font-weight: 800;
+cursor: pointer;
+font-family: 'Inter', sans-serif;
+transition: all 0.2s;
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+}
+
+.btn-compare-now:hover {
+background: #f0f4ff;
+transform: scale(1.05);
+box-shadow: 0 4px 16px rgba(255,255,255,0.25);
+}
+
+.empty-state {
+text-align: center;
+padding: 80px 24px;
+background: #fff;
+border-radius: 16px;
+border: 1px dashed var(--border);
+}
+
+.empty-icon { font-size: 56px; margin-bottom: 16px; }
+.empty-state h4 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.empty-state p { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+
+.rank-number {
+position: absolute;
+top: 12px;
+right: 16px;
+font-size: 11px;
+font-weight: 800;
+color: var(--text-secondary);
+background: #f1f5f9;
+border-radius: 100px;
+padding: 2px 8px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="animate-in">
+
+    {% if results %}
+    <!-- Header -->
+    <div class="results-header" {% if is_live_fallback %}style="background: linear-gradient(135deg, #10b981, #059669);"
+        {% endif %}>
+        <div>
+            <h3>{% if is_live_fallback %}🌍 Live Web Results{% else %}🎓 Recommended Universities{% endif %}</h3>
+            <p>{{ explanation }}</p>
+        </div>
+        <div class="result-count-badge">{{ results|length }} Results</div>
+    </div>
+
+    <!-- Cards grid (form needed for CSRF token only) -->
+    <form method="post" action="{% url 'compare' %}" id="compareForm">
+        {% csrf_token %}
+
+        <div class="row g-4">
+            {% for item in results %}
+            <div class="col-md-6 col-lg-4">
+                <div class="uni-card" style="animation-delay: {{ forloop.counter0 }}00ms;">
+                    <div class="uni-card-top" style="position:relative;">
+                        <span class="rank-number">#{{ forloop.counter }}</span>
+                        <div class="d-flex align-items-start gap-2">
+                            <div class="flex-1">
+                                <div class="uni-name">{{ item.course.university.name }}</div>
+                                <div class="uni-meta">
+                                    <span class="meta-tag country">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        {% if item.course.university.actual_location %}
+                                        {{ item.course.university.actual_location }}
+                                        {% else %}
+                                        {{ item.course.university.location }}
+                                        {% endif %}
+                                    </span>
+                                    <span class="meta-tag fees">
+                                        <i class="bi bi-currency-dollar"></i>
+                                        {{ item.course.annual_fees|floatformat:0 }}/yr
+                                    </span>
+                                    {% if item.course.university.ranking_score >= 80 %}
+                                    <span class="meta-tag rank"><i class="bi bi-star-fill"></i> Top Ranked</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if item.ml_score %}
+                            <div class="ml-score-badge">
+                                <span class="score-val">{{ item.ml_score }}</span>
+                                <span class="score-lbl">AI Score</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="uni-card-body">
+                        <div
+                            style="font-size:12px; color:var(--text-secondary); font-weight:600; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                            📖 {{ item.course.course_name }}
+                        </div>
+                        <div class="reasons-list">
+                            {% for reason in item.reasons %}
+                            <span class="reason-pill">✓ {{ reason }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="uni-card-footer">
+                        <label class="btn-compare-check" id="label-{{ item.course.university.id }}">
+                            <input type="checkbox" name="university_ids" value="{{ item.course.university.id }}"
+                                id="chk-{{ item.course.university.id }}" onchange="updateCompareBar()">
+                            Compare
+                        </label>
+                        <a href="{% url 'policies' item.course.university.id %}" class="btn-policies" target="_blank">
+                            <i class="bi bi-file-text"></i> Policies
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Floating compare bar -->
+        <div class="compare-bar" id="compareBar">
+            <span><i class="bi bi-bar-chart-steps me-1"></i> <span id="compareCount">0</span> selected — pick exactly
+                2</span>
+            <a id="compareNowBtn" href="#" class="btn-compare-now">
+                <i class="bi bi-arrow-right-circle-fill"></i> Compare Now
+            </a>
+        </div>
+    </form>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h4>No universities found</h4>
+        <p>We couldn't find any results matching your preferences. Try adjusting your course name or country.</p>
+        <a href="{% url 'filter' %}" class="btn-primary-custom">
+            <i class="bi bi-arrow-left"></i> Back to Search
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const compareUrl = "{% url 'compare' %}";
+
+    // Track selected university IDs (deduplicated)
+    const selectedIds = new Set();
+
+    function updateCompareBar() {
+        const allCheckboxes = document.querySelectorAll('input[name="university_ids"]');
+        const bar = document.getElementById('compareBar');
+        const countEl = document.getElementById('compareCount');
+        const btn = document.getElementById('compareNowBtn');
+
+        // Rebuild selected set from checked boxes
+        selectedIds.clear();
+        allCheckboxes.forEach(cb => {
+            if (cb.checked) selectedIds.add(cb.value);
+        });
+
+        // If more than 2 unique IDs somehow — uncheck last one
+        if (selectedIds.size > 2) {
+            const last = [...allCheckboxes].reverse().find(cb => cb.checked);
+            if (last) last.checked = false;
+            return updateCompareBar();
+        }
+
+        // If same university is checked twice (from two course cards), allow only once
+        allCheckboxes.forEach(cb => {
+            if (cb.checked && !selectedIds.has(cb.value)) {
+                cb.checked = false;
+            }
+        });
+
+        // Update label styling
+        document.querySelectorAll('.btn-compare-check').forEach(lbl => {
+            const cb = lbl.querySelector('input[type="checkbox"]');
+            if (cb && cb.checked) lbl.classList.add('selected');
+            else lbl.classList.remove('selected');
+        });
+
+        countEl.textContent = selectedIds.size;
+
+        if (selectedIds.size === 2) {
+            bar.classList.add('visible');
+            btn.onclick = function (e) {
+                e.preventDefault();
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = compareUrl;
+
+                // CSRF token
+                const csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrf.value;
+                form.appendChild(csrfInput);
+
+                // The two university IDs
+                [...selectedIds].forEach(id => {
+                    const inp = document.createElement('input');
+                    inp.type = 'hidden';
+                    inp.name = 'university_ids';
+                    inp.value = id;
+                    form.appendChild(inp);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+            };
+        } else {
+            bar.classList.remove('visible');
+        }
+    }
+</script>
+{% endblock %}

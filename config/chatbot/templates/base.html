@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduCounsel AI — {% block title %}Dashboard{% endblock %}</title>
+    <meta name="description" content="EduCounsel AI — Intelligent university recommendation and comparison system.">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        /* ── Design Tokens ─────────────────────────────────── */
+        :root {
+            --primary:        #4361ee;
+            --primary-dark:   #3347c4;
+            --secondary:      #7209b7;
+            --accent:         #f72585;
+            --success:        #06d6a0;
+            --warning:        #ffbe0b;
+            --danger:         #ef233c;
+
+            --sidebar-bg:     #0f172a;
+            --sidebar-width:  260px;
+            --topbar-h:       64px;
+
+            --card-bg:        #ffffff;
+            --page-bg:        #f1f5f9;
+            --text-primary:   #0f172a;
+            --text-secondary: #64748b;
+            --border:         #e2e8f0;
+
+            --radius-sm:  8px;
+            --radius-md:  14px;
+            --radius-lg:  20px;
+            --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md:  0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg:  0 8px 40px rgba(0,0,0,0.12);
+
+            --transition: 0.22s ease;
+        }
+
+        /* ── Reset & Base ──────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--page-bg);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Sidebar ───────────────────────────────────────── */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            padding: 0;
+            transition: transform var(--transition);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .sidebar-brand-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .sidebar-brand-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 400;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: rgba(255,255,255,0.25);
+            font-weight: 600;
+            padding: 10px 12px 4px;
+            margin-top: 8px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: var(--radius-sm);
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition);
+            position: relative;
+        }
+
+        .sidebar-link i {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.07);
+            color: #fff;
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(135deg, rgba(67,97,238,0.3), rgba(114,9,183,0.2));
+            color: #fff;
+        }
+
+        .sidebar-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 20%; bottom: 20%;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+            background: var(--primary);
+        }
+
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-avatar {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .sidebar-username {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-role {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+        }
+
+        /* ── Main Layout ───────────────────────────────────── */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ── Topbar ────────────────────────────────────────── */
+        .topbar {
+            height: var(--topbar-h);
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            gap: 16px;
+        }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .topbar-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--page-bg);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 6px 14px 6px 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .topbar-pill-avatar {
+            width: 26px; height: 26px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* ── Page Content ──────────────────────────────────── */
+        .page-content {
+            flex: 1;
+            padding: 28px;
+        }
+
+        /* ── Cards ─────────────────────────────────────────── */
+        .card-glass {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+
+        .card-glass:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ── Stat Card ─────────────────────────────────────── */
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+        .stat-icon {
+            width: 54px; height: 54px;
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* ── Buttons ───────────────────────────────────────── */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 10px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #2635a0);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(67,97,238,0.4);
+            color: #fff;
+        }
+
+        .btn-accent-custom {
+            background: linear-gradient(135deg, var(--accent), #c2185b);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 10px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-accent-custom:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(247,37,133,0.35);
+            color: #fff;
+        }
+
+        /* ── Form Inputs ───────────────────────────────────── */
+        .form-control-custom {
+            width: 100%;
+            padding: 11px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: var(--text-primary);
+            background: #fff;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            outline: none;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.12);
+        }
+
+        select.form-control-custom { appearance: auto; }
+
+        /* ── Badges ────────────────────────────────────────── */
+        .badge-score {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-pill {
+            background: #eef2ff;
+            color: var(--primary);
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        /* ── Page title block ──────────────────────────────── */
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* ── Responsive: hide sidebar on small screens ─────── */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-wrapper { margin-left: 0; }
+        }
+
+        /* ── Animations ────────────────────────────────────── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in { animation: fadeInUp 0.35s ease forwards; }
+
+        {% block extra_style %}{% endblock %}
+    </style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">🎓</div>
+        <div>
+            <div class="sidebar-brand-text">EduCounsel</div>
+            <div class="sidebar-brand-sub">AI University Advisor</div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a href="{% url 'dashboard' %}"
+           class="sidebar-link {% block nav_dashboard %}{% endblock %}">
+            <i class="bi bi-grid-1x2-fill"></i> Dashboard
+        </a>
+
+        <div class="sidebar-section-label">Discover</div>
+        <a href="{% url 'filter' %}"
+           class="sidebar-link {% block nav_filter %}{% endblock %}">
+            <i class="bi bi-search"></i> Smart Search
+        </a>
+        <a href="{% url 'chatbot' %}"
+           class="sidebar-link {% block nav_chatbot %}{% endblock %}">
+            <i class="bi bi-chat-dots-fill"></i> AI Chatbot
+        </a>
+        <a href="{% url 'compare' %}"
+           class="sidebar-link {% block nav_compare %}{% endblock %}">
+            <i class="bi bi-bar-chart-steps"></i> Compare
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">
+                {{ request.user.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <div class="sidebar-username">{{ request.user.username }}</div>
+                <div class="sidebar-role">Student</div>
+            </div>
+        </div>
+        <a href="{% url 'logout' %}" class="sidebar-link" style="color: rgba(255,100,100,0.7);">
+            <i class="bi bi-box-arrow-left"></i> Logout
+        </a>
+    </div>
+</aside>
+
+<!-- ══ MAIN WRAPPER ══════════════════════════════════════════════════════════ -->
+<div class="main-wrapper">
+
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+        <div class="topbar-pill">
+            <div class="topbar-pill-avatar">
+                {{ request.user.username|slice:":1"|upper }}
+            </div>
+            {{ request.user.username }}
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="page-content">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

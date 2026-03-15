@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}University Policies{% endblock %}
+{% block page_title %}University Policies{% endblock %}
+
+{% block extra_style %}
+.policy-hero {
+background: linear-gradient(135deg, #0f172a, #1e1b4b 70%, #312e81);
+border-radius: 16px;
+padding: 28px 32px;
+color: #fff;
+margin-bottom: 28px;
+display: flex;
+align-items: center;
+gap: 20px;
+}
+
+.policy-hero-icon {
+width: 60px; height: 60px;
+background: rgba(255,255,255,0.1);
+border-radius: 14px;
+display: flex; align-items: center; justify-content: center;
+font-size: 28px;
+flex-shrink: 0;
+}
+
+.policy-hero h2 {
+font-size: 22px;
+font-weight: 800;
+margin-bottom: 4px;
+}
+
+.policy-hero p {
+font-size: 13px;
+color: rgba(255,255,255,0.65);
+margin: 0;
+}
+
+.policy-section {
+margin-bottom: 28px;
+}
+
+.policy-section-header {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 14px;
+}
+
+.policy-section-title {
+font-size: 15px;
+font-weight: 800;
+color: var(--text-primary);
+}
+
+.policy-type-badge {
+padding: 4px 12px;
+border-radius: 100px;
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+.policy-card {
+background: #fff;
+border: 1px solid var(--border);
+border-radius: 14px;
+padding: 20px 22px;
+margin-bottom: 12px;
+box-shadow: var(--shadow-sm);
+transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.policy-card:hover {
+transform: translateX(4px);
+box-shadow: var(--shadow-md);
+}
+
+.policy-card-top {
+display: flex;
+align-items: flex-start;
+gap: 14px;
+margin-bottom: 10px;
+}
+
+.policy-icon-box {
+width: 38px; height: 38px;
+border-radius: 10px;
+display: flex; align-items: center; justify-content: center;
+font-size: 18px;
+flex-shrink: 0;
+background: #eef2ff;
+}
+
+.policy-title {
+font-size: 15px;
+font-weight: 700;
+color: var(--text-primary);
+margin-bottom: 4px;
+flex: 1;
+}
+
+.policy-year-badge {
+background: #f1f5f9;
+color: var(--text-secondary);
+border-radius: 100px;
+padding: 3px 10px;
+font-size: 11px;
+font-weight: 600;
+white-space: nowrap;
+}
+
+.policy-desc {
+font-size: 13px;
+color: var(--text-secondary);
+line-height: 1.6;
+padding-left: 52px;
+}
+
+.empty-state {
+text-align: center;
+padding: 80px 24px;
+background: #fff;
+border-radius: 16px;
+border: 1px dashed var(--border);
+}
+
+.back-btn {
+background: #fff;
+border: 1.5px solid var(--border);
+border-radius: 10px;
+padding: 9px 18px;
+font-size: 13px;
+font-weight: 700;
+color: var(--text-primary);
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+transition: all 0.2s;
+}
+.back-btn:hover { background: #f1f5f9; color: var(--text-primary); }
+
+/* Type-based colour mapping */
+.badge-admissions { background: #eef2ff; color: #4338ca; }
+.badge-scholarship { background: #f0fdf4; color: #166534; }
+.badge-refund { background: #fffbeb; color: #92400e; }
+.badge-conduct { background: #fff1f2; color: #9f1239; }
+.badge-academic { background: #f5f3ff; color: #6d28d9; }
+.badge-default { background: #f1f5f9; color: #475569; }
+
+.icon-admissions { background: #eef2ff; }
+.icon-scholarship { background: #f0fdf4; }
+.icon-refund { background: #fffbeb; }
+.icon-conduct { background: #fff1f2; }
+.icon-academic { background: #f5f3ff; }
+{% endblock %}
+
+{% block content %}
+<div class="animate-in">
+
+    <!-- Hero -->
+    <div class="policy-hero">
+        <div class="policy-hero-icon">📜</div>
+        <div>
+            <h2>{{ university.name }}</h2>
+            <p>{{ university.location }} &nbsp;·&nbsp; {{ university.university_type }} &nbsp;·&nbsp; {{
+                university.accreditation }}</p>
+        </div>
+        <a href="javascript:history.back()" class="back-btn ms-auto"
+            style="color:#fff; border-color:rgba(255,255,255,0.25); background:rgba(255,255,255,0.1);">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+
+    {% if grouped %}
+    {% for policy_type, policies in grouped.items %}
+    <div class="policy-section">
+        <div class="policy-section-header">
+            <span class="policy-section-title">
+                {% if 'Admission' in policy_type %}🎓
+                {% elif 'Scholarship' in policy_type %}💰
+                {% elif 'Refund' in policy_type %}💳
+                {% elif 'Conduct' in policy_type %}⚖️
+                {% elif 'Academic' in policy_type %}📚
+                {% else %}📋
+                {% endif %}
+                {{ policy_type }}
+            </span>
+            <span class="policy-type-badge
+                {% if 'Admission' in policy_type %}badge-admissions
+                {% elif 'Scholarship' in policy_type %}badge-scholarship
+                {% elif 'Refund' in policy_type %}badge-refund
+                {% elif 'Conduct' in policy_type %}badge-conduct
+                {% elif 'Academic' in policy_type %}badge-academic
+                {% else %}badge-default{% endif %}">
+                {{ policies|length }} polic{{ policies|length|pluralize:"y,ies" }}
+            </span>
+        </div>
+
+        {% for policy in policies %}
+        <div class="policy-card">
+            <div class="policy-card-top">
+                <div class="policy-icon-box
+                    {% if 'Admission' in policy_type %}icon-admissions
+                    {% elif 'Scholarship' in policy_type %}icon-scholarship
+                    {% elif 'Refund' in policy_type %}icon-refund
+                    {% elif 'Conduct' in policy_type %}icon-conduct
+                    {% elif 'Academic' in policy_type %}icon-academic
+                    {% endif %}">
+                    {% if 'Admission' in policy_type %}🎓
+                    {% elif 'Scholarship' in policy_type %}💰
+                    {% elif 'Refund' in policy_type %}💳
+                    {% elif 'Conduct' in policy_type %}⚖️
+                    {% elif 'Academic' in policy_type %}📖
+                    {% else %}📋
+                    {% endif %}
+                </div>
+                <div class="policy-title">{{ policy.policy_title }}</div>
+                <span class="policy-year-badge">{{ policy.effective_year }}</span>
+            </div>
+            <p class="policy-desc">{{ policy.policy_description }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="empty-state">
+        <div style="font-size:48px; margin-bottom:16px;">📭</div>
+        <h4 style="font-size:18px; font-weight:700; margin-bottom:8px;">No policies found</h4>
+        <p style="color:var(--text-secondary); font-size:14px;">This university has no recorded policies yet.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

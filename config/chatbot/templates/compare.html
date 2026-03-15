@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+{% block title %}Compare Universities{% endblock %}
+{% block page_title %}Compare Universities{% endblock %}
+{% block nav_compare %}active{% endblock %}
+
+{% block extra_style %}
+/* ── Picker Card ── */
+.compare-picker {
+background: #fff;
+border-radius: var(--radius-lg);
+border: 1px solid var(--border);
+box-shadow: var(--shadow-md);
+padding: 36px;
+max-width: 640px;
+margin: 0 auto;
+}
+
+.compare-picker h3 {
+font-size: 22px;
+font-weight: 800;
+margin-bottom: 6px;
+}
+
+.compare-picker p {
+font-size: 14px;
+color: var(--text-secondary);
+margin-bottom: 28px;
+}
+
+.vs-divider {
+text-align: center;
+font-size: 22px;
+font-weight: 900;
+color: var(--primary);
+padding: 8px 0;
+}
+
+.btn-compare-go {
+width: 100%;
+padding: 14px;
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+color: #fff;
+border: none;
+border-radius: 12px;
+font-family: 'Inter', sans-serif;
+font-size: 16px;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.22s;
+margin-top: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+}
+
+.btn-compare-go:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 24px rgba(67,97,238,0.35);
+}
+
+/* ── Result Header ── */
+.compare-result-header {
+display: flex;
+align-items: center;
+gap: 16px;
+margin-bottom: 24px;
+flex-wrap: wrap;
+}
+
+.compare-result-header h3 {
+font-size: 22px;
+font-weight: 800;
+flex: 1;
+}
+
+/* ── Comparison Table ── */
+.table-compare {
+width: 100%;
+border-collapse: separate;
+border-spacing: 0;
+background: #fff;
+border-radius: 16px;
+overflow: hidden;
+box-shadow: var(--shadow-md);
+border: 1px solid var(--border);
+font-size: 14px;
+}
+
+.table-compare thead tr {
+background: linear-gradient(135deg, #0f172a, #1e1b4b);
+color: #fff;
+}
+
+.table-compare thead th {
+padding: 18px 20px;
+font-weight: 700;
+font-size: 14px;
+text-align: center;
+border: none;
+}
+
+.table-compare thead th:first-child {
+text-align: left;
+width: 28%;
+background: rgba(255,255,255,0.04);
+}
+
+.uni-header-name {
+font-size: 16px;
+font-weight: 800;
+display: block;
+margin-bottom: 4px;
+}
+
+.uni-header-sub {
+font-size: 11px;
+opacity: 0.65;
+font-weight: 400;
+}
+
+.table-compare tbody tr:nth-child(odd) { background: #f8fafc; }
+.table-compare tbody tr:nth-child(even) { background: #fff; }
+.table-compare tbody tr:hover { background: #eef2ff; transition: background 0.15s; }
+
+.table-compare tbody td {
+padding: 14px 20px;
+border: none;
+border-bottom: 1px solid #f1f5f9;
+vertical-align: middle;
+}
+
+.table-compare tbody td:first-child {
+font-weight: 700;
+color: var(--text-secondary);
+font-size: 12px;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+.table-compare tbody td:not(:first-child) {
+text-align: center;
+font-weight: 500;
+color: var(--text-primary);
+}
+
+.winner-cell {
+background: #f0fdf4 !important;
+color: #15803d;
+font-weight: 700 !important;
+}
+
+.winner-badge {
+display: inline-block;
+background: #dcfce7;
+color: #15803d;
+border-radius: 100px;
+padding: 2px 8px;
+font-size: 10px;
+font-weight: 700;
+margin-left: 6px;
+}
+
+.courses-list {
+display: flex;
+flex-wrap: wrap;
+gap: 4px;
+justify-content: center;
+}
+
+.course-chip {
+background: #eef2ff;
+color: var(--primary);
+border-radius: 100px;
+padding: 3px 10px;
+font-size: 11px;
+font-weight: 500;
+}
+
+.alert-error {
+background: #fff1f2;
+border: 1px solid #fecdd3;
+color: #be123c;
+border-radius: 10px;
+padding: 14px 18px;
+font-size: 14px;
+font-weight: 500;
+margin-bottom: 20px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.back-btn {
+background: #fff;
+border: 1.5px solid var(--border);
+border-radius: 10px;
+padding: 9px 18px;
+font-size: 13px;
+font-weight: 700;
+color: var(--text-primary);
+cursor: pointer;
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+transition: all 0.2s;
+font-family: 'Inter', sans-serif;
+}
+
+.back-btn:hover { background: #f1f5f9; color: var(--text-primary); }
+{% endblock %}
+
+{% block content %}
+<div class="animate-in">
+
+    {% if compared %}
+
+    <!-- ── Result View ── -->
+    <div class="compare-result-header">
+        <h3>📊 University Comparison</h3>
+        <a href="{% url 'compare' %}" class="back-btn">
+            <i class="bi bi-arrow-left"></i> New Comparison
+        </a>
+    </div>
+
+    {% if error %}
+    <div class="alert-error"><i class="bi bi-exclamation-circle-fill"></i> {{ error }}</div>
+    {% endif %}
+
+    <div style="overflow-x:auto;">
+        <table class="table-compare">
+            <thead>
+                <tr>
+                    <th>Criteria</th>
+                    <th>
+                        <span class="uni-header-name">{{ uni_a.name }}</span>
+                        <span class="uni-header-sub">{{ uni_a.actual_location|default:uni_a.location }}</span>
+                    </th>
+                    <th>
+                        <span class="uni-header-name">{{ uni_b.name }}</span>
+                        <span class="uni-header-sub">{{ uni_b.actual_location|default:uni_b.location }}</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>🌍 Country / Location</td>
+                    <td>{{ uni_a.actual_location|default:uni_a.location }}</td>
+                    <td>{{ uni_b.actual_location|default:uni_b.location }}</td>
+                </tr>
+                <tr>
+                    <td>🏛️ University Type</td>
+                    <td>{{ uni_a.university_type }}</td>
+                    <td>{{ uni_b.university_type }}</td>
+                </tr>
+                <tr>
+                    <td>✅ Accreditation</td>
+                    <td>{{ uni_a.accreditation }}</td>
+                    <td>{{ uni_b.accreditation }}</td>
+                </tr>
+                <tr>
+                    <td>🏆 Ranking Score</td>
+                    {% if uni_a.ranking_score >= uni_b.ranking_score %}
+                    <td class="winner-cell">
+                        {{ uni_a.ranking_score }}
+                        {% if uni_a.ranking_score > uni_b.ranking_score %}
+                        <span class="winner-badge">Better</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ uni_b.ranking_score }}</td>
+                    {% else %}
+                    <td>{{ uni_a.ranking_score }}</td>
+                    <td class="winner-cell">
+                        {{ uni_b.ranking_score }}
+                        <span class="winner-badge">Better</span>
+                    </td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>📜 Policies</td>
+                    <td><a href="{% url 'policies' uni_a.id %}"
+                            style="color:var(--primary); font-weight:600; font-size:13px;" target="_blank">View Policies
+                            →</a></td>
+                    <td><a href="{% url 'policies' uni_b.id %}"
+                            style="color:var(--primary); font-weight:600; font-size:13px;" target="_blank">View Policies
+                            →</a></td>
+                </tr>
+                <tr>
+                    <td>📚 Courses Offered</td>
+                    <td>
+                        <div class="courses-list">
+                            {% for c in courses_a %}
+                            {% if forloop.counter <= 5 %} <span class="course-chip">{{ c.course_name }}</span>
+                                {% endif %}
+                                {% endfor %}
+                                {% if courses_a.count > 5 %}
+                                <span class="course-chip">+{{ courses_a.count|add:"-5" }} more</span>
+                                {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="courses-list">
+                            {% for c in courses_b %}
+                            {% if forloop.counter <= 5 %} <span class="course-chip">{{ c.course_name }}</span>
+                                {% endif %}
+                                {% endfor %}
+                                {% if courses_b.count > 5 %}
+                                <span class="course-chip">+{{ courses_b.count|add:"-5" }} more</span>
+                                {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+
+    <!-- ── Picker View ── -->
+    <div class="page-header">
+        <h1>📊 Compare Universities</h1>
+        <p>Select two universities to see a detailed side-by-side comparison.</p>
+    </div>
+
+    <div class="compare-picker">
+        <h3>Select Two Universities</h3>
+        <p>Choose any two universities from the list below and click Compare.</p>
+
+        {% if error %}
+        <div class="alert-error"><i class="bi bi-exclamation-circle-fill"></i> {{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="margin-bottom:16px;">
+                <label
+                    style="font-size:13px; font-weight:700; color:var(--text-primary); display:block; margin-bottom:6px;">
+                    🏛️ University A
+                </label>
+                <select name="university_ids"
+                    style="width:100%; padding:12px 16px; border:1.5px solid var(--border); border-radius:10px; font-family:'Inter',sans-serif; font-size:14px; outline:none;"
+                    required>
+                    <option value="">— Select first university —</option>
+                    {% for uni in all_universities %}
+                    <option value="{{ uni.id }}">{{ uni.name }} ({{ uni.location }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="vs-divider">⚡ VS ⚡</div>
+
+            <div style="margin-bottom:24px;">
+                <label
+                    style="font-size:13px; font-weight:700; color:var(--text-primary); display:block; margin-bottom:6px;">
+                    🏛️ University B
+                </label>
+                <select name="university_ids"
+                    style="width:100%; padding:12px 16px; border:1.5px solid var(--border); border-radius:10px; font-family:'Inter',sans-serif; font-size:14px; outline:none;"
+                    required>
+                    <option value="">— Select second university —</option>
+                    {% for uni in all_universities %}
+                    <option value="{{ uni.id }}">{{ uni.name }} ({{ uni.location }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-compare-go">
+                <i class="bi bi-bar-chart-steps"></i> Compare Universities
+            </button>
+        </form>
+    </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}

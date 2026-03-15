@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block extra_style %}
+.hero-card {
+background: linear-gradient(135deg, #4361ee 0%, #7209b7 60%, #f72585 100%);
+border-radius: 20px;
+padding: 36px 40px;
+color: #fff;
+margin-bottom: 28px;
+position: relative;
+overflow: hidden;
+}
+.hero-card::before {
+content: '';
+position: absolute;
+top: -60px; right: -60px;
+width: 260px; height: 260px;
+border-radius: 50%;
+background: rgba(255,255,255,0.07);
+}
+.hero-card::after {
+content: '';
+position: absolute;
+bottom: -40px; right: 120px;
+width: 160px; height: 160px;
+border-radius: 50%;
+background: rgba(255,255,255,0.05);
+}
+.hero-title {
+font-size: 26px;
+font-weight: 800;
+margin-bottom: 8px;
+}
+.hero-sub {
+font-size: 14px;
+color: rgba(255,255,255,0.75);
+max-width: 500px;
+line-height: 1.6;
+margin-bottom: 24px;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-btn {
+background: rgba(255,255,255,0.2);
+color: #fff;
+border: 1.5px solid rgba(255,255,255,0.3);
+border-radius: 10px;
+padding: 10px 20px;
+font-family: 'Inter', sans-serif;
+font-size: 14px;
+font-weight: 600;
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+gap: 8px;
+backdrop-filter: blur(4px);
+transition: all 0.22s;
+}
+.hero-btn:hover {
+background: rgba(255,255,255,0.32);
+color: #fff;
+transform: translateY(-1px);
+}
+.hero-btn-solid {
+background: #fff;
+color: #4361ee;
+border-color: #fff;
+}
+.hero-btn-solid:hover { background: #f0f4ff; color: #3347c4; }
+
+.section-title {
+font-size: 16px;
+font-weight: 700;
+color: var(--text-primary);
+margin-bottom: 16px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.chart-card {
+background: #fff;
+border-radius: var(--radius-md);
+border: 1px solid var(--border);
+box-shadow: var(--shadow-md);
+padding: 24px;
+}
+
+.chart-card h6 {
+font-size: 14px;
+font-weight: 700;
+color: var(--text-primary);
+margin-bottom: 18px;
+}
+
+.quick-card {
+background: #fff;
+border-radius: var(--radius-md);
+border: 1px solid var(--border);
+box-shadow: var(--shadow-md);
+padding: 24px;
+text-align: center;
+transition: transform 0.22s, box-shadow 0.22s;
+text-decoration: none;
+display: block;
+color: inherit;
+}
+.quick-card:hover {
+transform: translateY(-4px);
+box-shadow: var(--shadow-lg);
+color: inherit;
+}
+.quick-icon {
+width: 56px; height: 56px;
+border-radius: 14px;
+display: flex; align-items: center; justify-content: center;
+font-size: 26px;
+margin: 0 auto 14px;
+}
+.quick-card h5 {
+font-size: 15px;
+font-weight: 700;
+margin-bottom: 6px;
+}
+.quick-card p {
+font-size: 13px;
+color: var(--text-secondary);
+margin: 0;
+line-height: 1.5;
+}
+
+/* Animated counter */
+.counter { transition: all 0.5s ease; }
+{% endblock %}
+
+{% block content %}
+<div style="animation: fadeInUp 0.4s ease;">
+
+    <!-- Hero -->
+    <div class="hero-card">
+        <div class="hero-title">👋 Welcome back, {{ request.user.username }}!</div>
+        <p class="hero-sub">
+            Explore universities worldwide using intelligent filters and AI-powered recommendations.
+            Compare institutions, browse courses, and find your perfect fit.
+        </p>
+        <div class="hero-actions">
+            <a href="{% url 'filter' %}" class="hero-btn hero-btn-solid">
+                <i class="bi bi-search"></i> Start Searching
+            </a>
+            <a href="{% url 'chatbot' %}" class="hero-btn">
+                <i class="bi bi-chat-dots-fill"></i> Ask AI
+            </a>
+            <a href="{% url 'compare' %}" class="hero-btn">
+                <i class="bi bi-bar-chart-steps"></i> Compare
+            </a>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="section-title"><i class="bi bi-lightning-charge-fill text-warning"></i> AI Insights</div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card animate-in" style="animation-delay:0.05s;">
+                <div class="stat-icon" style="background:#eef2ff;">🏛️</div>
+                <div>
+                    <div class="stat-value text-primary counter">{{ total_universities }}</div>
+                    <div class="stat-label">Universities</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card animate-in" style="animation-delay:0.1s;">
+                <div class="stat-icon" style="background:#f0fdf4;">📚</div>
+                <div>
+                    <div class="stat-value text-success counter">{{ total_courses }}</div>
+                    <div class="stat-label">Courses</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card animate-in" style="animation-delay:0.15s;">
+                <div class="stat-icon" style="background:#fffbeb;">💰</div>
+                <div>
+                    <div class="stat-value text-warning counter">${{ avg_fees|floatformat:0 }}</div>
+                    <div class="stat-label">Avg. Annual Fees</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card animate-in" style="animation-delay:0.2s;">
+                <div class="stat-icon" style="background:#fff1f2;">🏆</div>
+                <div>
+                    <div class="stat-value" style="font-size:14px; font-weight:700; color:#ef233c;">
+                        {{ top_university.name|truncatechars:20 }}
+                    </div>
+                    <div class="stat-label">Top Ranked</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-7">
+            <div class="chart-card" style="height:300px;">
+                <h6><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Universities by Country (Top 8)</h6>
+                <canvas id="countryChart" style="max-height:225px;"></canvas>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="chart-card" style="height:300px;">
+                <h6><i class="bi bi-pie-chart-fill me-2 text-secondary"></i>By University Type</h6>
+                <canvas id="typeChart" style="max-height:225px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-title"><i class="bi bi-rocket-takeoff-fill text-primary"></i> Quick Actions</div>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <a href="{% url 'filter' %}" class="quick-card">
+                <div class="quick-icon" style="background:#eef2ff;">🔎</div>
+                <h5>Smart Search</h5>
+                <p>Filter universities by course, country, and budget.</p>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'chatbot' %}" class="quick-card">
+                <div class="quick-icon" style="background:#f5f3ff;">🤖</div>
+                <h5>AI Chatbot</h5>
+                <p>Chat with our AI to get personalised recommendations instantly.</p>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'compare' %}" class="quick-card">
+                <div class="quick-icon" style="background:#fff1f2;">📊</div>
+                <h5>Compare Universities</h5>
+                <p>Side-by-side comparison of any two institutions.</p>
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+    const COUNTRIES = {{ countries_json| safe }};
+    const COUNTRY_COUNTS = {{ country_counts_json| safe }};
+    const TYPES = {{ types_json| safe }};
+    const TYPE_COUNTS = {{ type_counts_json| safe }};
+
+    const palette = ['#4361ee', '#7209b7', '#f72585', '#06d6a0', '#ffbe0b', '#ef233c', '#3a86ff', '#8338ec'];
+
+    // Bar chart — universities by country
+    new Chart(document.getElementById('countryChart'), {
+        type: 'bar',
+        data: {
+            labels: COUNTRIES,
+            datasets: [{
+                label: 'Universities',
+                data: COUNTRY_COUNTS,
+                backgroundColor: palette,
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} universities` } }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 } } },
+                x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 } } }
+            }
+        }
+    });
+
+    // Doughnut chart — university types
+    new Chart(document.getElementById('typeChart'), {
+        type: 'doughnut',
+        data: {
+            labels: TYPES,
+            datasets: [{
+                data: TYPE_COUNTS,
+                backgroundColor: palette,
+                borderWidth: 2,
+                borderColor: '#fff',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { family: 'Inter', size: 11 }, padding: 10 }
+                }
+            },
+            cutout: '62%',
+        }
+    });
+</script>
+{% endblock %}

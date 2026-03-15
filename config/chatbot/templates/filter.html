@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}Smart Search{% endblock %}
+{% block page_title %}Smart Search{% endblock %}
+{% block nav_filter %}active{% endblock %}
+
+{% block extra_style %}
+.filter-card {
+background: #fff;
+border-radius: var(--radius-lg);
+border: 1px solid var(--border);
+box-shadow: var(--shadow-md);
+padding: 36px;
+max-width: 760px;
+margin: 0 auto;
+}
+
+.filter-title {
+font-size: 22px;
+font-weight: 800;
+color: var(--text-primary);
+margin-bottom: 6px;
+}
+
+.filter-subtitle {
+font-size: 14px;
+color: var(--text-secondary);
+margin-bottom: 32px;
+}
+
+.form-group-custom { margin-bottom: 22px; }
+
+.form-label-custom {
+font-size: 13px;
+font-weight: 700;
+color: var(--text-primary);
+display: flex;
+align-items: center;
+gap: 6px;
+margin-bottom: 8px;
+}
+
+.input-with-icon { position: relative; }
+
+.input-prefix {
+position: absolute;
+left: 14px; top: 50%;
+transform: translateY(-50%);
+font-size: 16px;
+color: #94a3b8;
+pointer-events: none;
+}
+
+.form-control-custom {
+width: 100%;
+padding: 12px 16px 12px 42px;
+border: 1.5px solid var(--border);
+border-radius: 10px;
+font-family: 'Inter', sans-serif;
+font-size: 14px;
+color: var(--text-primary);
+background: #fff;
+outline: none;
+transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control-custom:focus {
+border-color: var(--primary);
+box-shadow: 0 0 0 3px rgba(67,97,238,0.1);
+}
+
+select.form-control-custom { appearance: auto; }
+
+.budget-row {
+display: flex;
+align-items: center;
+gap: 14px;
+}
+
+.budget-display {
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+color: #fff;
+border-radius: 10px;
+padding: 10px 18px;
+font-size: 15px;
+font-weight: 700;
+white-space: nowrap;
+min-width: 120px;
+text-align: center;
+}
+
+input[type="range"] {
+flex: 1;
+accent-color: var(--primary);
+height: 6px;
+cursor: pointer;
+}
+
+.divider {
+border: none;
+border-top: 1px solid var(--border);
+margin: 28px 0;
+}
+
+.btn-search {
+width: 100%;
+padding: 14px;
+background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+color: #fff;
+border: none;
+border-radius: 12px;
+font-family: 'Inter', sans-serif;
+font-size: 16px;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.22s;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+}
+
+.btn-search:hover {
+background: linear-gradient(135deg, var(--primary-dark), #2635a0);
+transform: translateY(-2px);
+box-shadow: 0 8px 24px rgba(67,97,238,0.35);
+}
+
+.btn-search .spinner-border { display: none; }
+.btn-search.loading .btn-text { display: none; }
+.btn-search.loading .spinner-border { display: inline-block; }
+
+.tips-box {
+background: #f8fafc;
+border: 1px dashed var(--border);
+border-radius: 10px;
+padding: 16px 18px;
+margin-top: 16px;
+}
+
+.tips-box h6 {
+font-size: 12px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.8px;
+color: var(--text-secondary);
+margin-bottom: 8px;
+}
+
+.tip-item {
+font-size: 12px;
+color: var(--text-secondary);
+display: flex;
+align-items: center;
+gap: 6px;
+margin-bottom: 4px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="animate-in">
+    <div class="page-header">
+        <h1>🔎 Smart University Search</h1>
+        <p>Filter from 1,000+ universities by course, country, and budget.</p>
+    </div>
+
+    <div class="filter-card">
+        <div class="filter-title">Find your ideal university</div>
+        <p class="filter-subtitle">Fill in your preferences below and our system will find the best matches for you.</p>
+
+        <form method="post" id="filterForm">
+            {% csrf_token %}
+
+            <div class="row g-3">
+                <!-- Course -->
+                <div class="col-md-6">
+                    <div class="form-group-custom">
+                        <label class="form-label-custom" for="id_course">
+                            <i class="bi bi-mortarboard-fill text-primary"></i> Course
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-search input-prefix"></i>
+                            <input id="id_course" class="form-control-custom" type="text" name="course"
+                                placeholder="e.g. Computer Science, MBA" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Country -->
+                <div class="col-md-6">
+                    <div class="form-group-custom">
+                        <label class="form-label-custom" for="id_country">
+                            <i class="bi bi-globe-americas text-success"></i> Country
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-geo-alt input-prefix"></i>
+                            <select id="id_country" class="form-control-custom" name="country" required>
+                                <option value="">— Select a country —</option>
+                                {% for c in countries %}
+                                <option value="{{ c }}">{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Slider -->
+            <div class="form-group-custom">
+                <label class="form-label-custom">
+                    <i class="bi bi-wallet2 text-warning"></i> Maximum Annual Budget (USD)
+                </label>
+                <div class="budget-row">
+                    <input type="range" id="budgetSlider" name="budget" min="5000" max="100000" step="1000"
+                        value="30000"
+                        oninput="document.getElementById('budgetDisplay').textContent = '$' + Number(this.value).toLocaleString()">
+                    <div class="budget-display" id="budgetDisplay">$30,000</div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <button type="submit" class="btn-search" id="searchBtn" onclick="this.classList.add('loading')">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+                <span class="btn-text"><i class="bi bi-search me-1"></i> Search Universities</span>
+            </button>
+        </form>
+
+        <div class="tips-box">
+            <h6>💡 Search Tips</h6>
+            <div class="tip-item"><i class="bi bi-circle-fill text-primary" style="font-size:6px;"></i> Use partial
+                names: "Data" will match "Data Science", "Big Data", etc.</div>
+            <div class="tip-item"><i class="bi bi-circle-fill text-primary" style="font-size:6px;"></i> Budget filter is
+                auto-relaxed if no results are found.</div>
+            <div class="tip-item"><i class="bi bi-circle-fill text-primary" style="font-size:6px;"></i> Results are
+                sorted by ML suitability score.</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
